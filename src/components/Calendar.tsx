@@ -3,7 +3,7 @@ import { LocalTime } from '@js-joda/core';
 import { useMemo, useState } from 'react';
 import { Event, RawEvent } from '../types/event';
 import rawEvents from '../input.json';
-import { AddEventForm, TimeStamps } from './';
+import { ActualTimeOfTheDayIndicator, AddEventForm, TimeStamps } from './';
 
 const Container = styled.div`
   min-width: 100vw;
@@ -34,23 +34,34 @@ function parseEvents(data: Array<RawEvent>) {
     );
 }
 
-const ActualTimeOfTheDayIndicator = () => {
-  const hour = LocalTime.of(16, 24).hour();
-  const minutes = LocalTime.of(16, 45).minute();
-  console.log(hour);
+const colors = [
+  '#a6b1e1',
+  '#ffb85c',
+  '#bf93b1',
+  '#8cb25d',
+  '#d07676',
+  '#576bc7',
+  '#b86800',
+  '#673C59',
+  '#386600',
+  '#6A2424',
+];
+
+export const DrawEvent = ({ event }: { event: Event }) => {
   return (
     <div
       style={{
+        backgroundColor: colors[event.id % colors.length],
         position: 'absolute',
-        color: 'red',
-        borderBottom: '2px solid red',
-        zIndex: 10,
+        height: `calc(${event.duration / 60} * 100% / 12 )`,
         width: '100%',
-        top: `calc((${hour} - 10)* 100% / 12 + 100% / 12 + ${
-          minutes / 60
+        top: `calc((${event.timeSlot.startTime.hour()} - 10)* 100% / 12 + 100% / 12 + ${
+          event.timeSlot.startTime.minute() / 60
         } * 100% / 12 )`,
       }}
-    ></div>
+    >
+      {event.id}
+    </div>
   );
 };
 
@@ -63,41 +74,40 @@ export const Calendar = () => {
 
   console.log({ events, maxId });
   return (
-    <>
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        height: '100vh',
+        flexDirection: 'column',
+        position: 'absolute',
+      }}
+    >
+      <p>Calendar</p>
       <div
         style={{
           display: 'flex',
           flexDirection: 'row',
           // gap: 20,
-          height: '100vh',
+          // height: '100vh',
+          position: 'relative',
+          flexGrow: 1,
         }}
       >
         <TimeStamps />
         <ActualTimeOfTheDayIndicator />
-        {/* <p>Calendar</p> */}
         <Container>
           {[...Array(12)].map((x, i) => (
             <HourSlice key={i} index={i}>
               {i}
             </HourSlice>
           ))}
-          {/* <div>
           {events?.map((event, i) => (
-            <div
-              style={{
-                height: `${100 / 12}%`,
-                display: "flex",
-                alignItems: "center"
-              }}
-              key={event.id}
-            >
-              {event.timeSlot.startTime.toString()}
-            </div>
+            <DrawEvent event={event} key={event.id} />
           ))}
-        </div> */}
         </Container>
       </div>
       {/* <AddEventForm setEvents={setEvents} maxId={maxId} /> */}
-    </>
+    </div>
   );
 };
