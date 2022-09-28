@@ -19,4 +19,6 @@ export class Event {
     this.duration = duration;
     this.color = color ?? 'red';
   }
+
+  overlappingEvent(Readonly<>)
 }
