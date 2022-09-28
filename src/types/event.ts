@@ -19,4 +19,12 @@ export class Event {
     this.duration = duration;
     this.color = color ?? 'red';
   }
+
+  overlappingEvents(events: Readonly<Array<Event>>) {
+    return events.reduce(
+      (res, event) =>
+        event.timeSlot.isOverlapping(this.timeSlot) ? [...res, event] : res,
+      [] as Array<Event>
+    );
+  }
 }

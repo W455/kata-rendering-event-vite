@@ -3,7 +3,12 @@ import { LocalTime } from '@js-joda/core';
 import { useMemo, useState } from 'react';
 import { Event, RawEvent } from '../types/event';
 import rawEvents from '../input.json';
-import { ActualTimeOfTheDayIndicator, AddEventForm, TimeStamps } from './';
+import {
+  ActualTimeOfTheDayIndicator,
+  AddEventForm,
+  DrawEvent,
+  TimeStamps,
+} from './';
 
 const Container = styled.div`
   min-width: 100vw;
@@ -12,6 +17,7 @@ const Container = styled.div`
   box-sizing: border-box !important;
   display: flex;
   flex-direction: row;
+  position: relative
 `;
 
 const HourSlice = styled('div')<{ index: number }>`
@@ -29,41 +35,12 @@ const HourSlice = styled('div')<{ index: number }>`
 function parseEvents(data: Array<RawEvent>) {
   return data
     .map((currentRawEvent) => new Event(currentRawEvent))
-    .sort((a, b) =>
-      a.timeSlot.startTime.isAfter(b.timeSlot.startTime) ? 1 : -1
-    );
+    .sort((a, b) => {
+      if (a.timeSlot.startTime.equals(b.timeSlot.startTime))
+        return a.timeSlot.endTime.isAfter(b.timeSlot.endTime) ? 1 : -1;
+      return a.timeSlot.startTime.isAfter(b.timeSlot.startTime) ? 1 : -1;
+    });
 }
-
-const colors = [
-  '#a6b1e1',
-  '#ffb85c',
-  '#bf93b1',
-  '#8cb25d',
-  '#d07676',
-  '#576bc7',
-  '#b86800',
-  '#673C59',
-  '#386600',
-  '#6A2424',
-];
-
-export const DrawEvent = ({ event }: { event: Event }) => {
-  return (
-    <div
-      style={{
-        backgroundColor: colors[event.id % colors.length],
-        position: 'absolute',
-        height: `calc(${event.duration / 60} * 100% / 12 )`,
-        width: '100%',
-        top: `calc((${event.timeSlot.startTime.hour()} - 10)* 100% / 12 + 100% / 12 + ${
-          event.timeSlot.startTime.minute() / 60
-        } * 100% / 12 )`,
-      }}
-    >
-      {event.id}
-    </div>
-  );
-};
 
 export const Calendar = () => {
   const [events, setEvents] = useState(() => parseEvents(rawEvents));
@@ -98,12 +75,10 @@ export const Calendar = () => {
         <ActualTimeOfTheDayIndicator />
         <Container>
           {[...Array(12)].map((x, i) => (
-            <HourSlice key={i} index={i}>
-              {i}
-            </HourSlice>
+            <HourSlice key={i} index={i} />
           ))}
           {events?.map((event, i) => (
-            <DrawEvent event={event} key={event.id} />
+            <DrawEvent event={event} events={events} key={event.id} />
           ))}
         </Container>
       </div>
