@@ -42,6 +42,55 @@ function parseEvents(data: Array<RawEvent>) {
     });
 }
 
+const computeEventsWidthsAndPosition = (events: Readonly<Array<Event>>) => {
+  const overlappingEventMap = events.reduce(
+    (map, event) =>
+      map.set(
+        event,
+        event.overlappingEvents(events).filter((e) => event !== e)
+      ),
+    new Map<Event, Array<Event>>()
+  );
+  const map1 = Array.from(overlappingEventMap.values());
+  let computation0: Map<Event, number> = new Map();
+  overlappingEventMap.forEach((array, event) =>
+    computation0.set(event, 100 / (array.length + 1))
+  );
+  let computation1: Map<Event, number> = new Map();
+  overlappingEventMap.forEach((array, event, map) =>
+    computation1.set(
+      event,
+      100 /
+        (new Set(map1.filter((tab) => tab.includes(event)).flat(1)).size + 1)
+    )
+  );
+  let computation2 = events.reduce(
+    (map, event) =>
+      map.set(
+        event,
+        Math.max(computation0.get(event) || 0, computation1.get(event) || 0)
+      ),
+    new Map<Event, number>()
+  );
+
+  console.log({
+    overlappingEventMap,
+    map1,
+    computation0,
+    computation1,
+    computation2,
+  });
+  return computation2;
+};
+
+const generateCalendarEvents = (events: Readonly<Array<Event>>) => {
+  const computation = computeEventsWidthsAndPosition(events);
+  return events.map((event) => {
+    const width = computation.get(event);
+    return { event, width };
+  });
+};
+
 export const Calendar = () => {
   const [events, setEvents] = useState(() => parseEvents(rawEvents));
   const maxId = useMemo(
@@ -49,7 +98,8 @@ export const Calendar = () => {
     [events]
   );
 
-  console.log({ events, maxId });
+  const calendarEvents = generateCalendarEvents(events);
+  computeEventsWidthsAndPosition(events);
   return (
     <div
       style={{
@@ -77,8 +127,8 @@ export const Calendar = () => {
           {[...Array(12)].map((x, i) => (
             <HourSlice key={i} index={i} />
           ))}
-          {events?.map((event, i) => (
-            <DrawEvent event={event} events={events} key={event.id} />
+          {calendarEvents?.map(({ event, width }, i) => (
+            <DrawEvent event={event} width={width} key={event.id} />
           ))}
         </Container>
       </div>

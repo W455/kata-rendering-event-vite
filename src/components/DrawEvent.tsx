@@ -15,12 +15,11 @@ const colors = [
 
 export const DrawEvent = ({
   event,
-  events,
+  width,
 }: {
   event: Event;
-  events: Array<Event>;
+  width: number;
 }) => {
-  const overlappingEvents = event.overlappingEvents(events);
   return (
     <div
       style={{
@@ -31,13 +30,11 @@ export const DrawEvent = ({
         backgroundColor: colors[event.id % colors.length],
         position: 'absolute',
         height: `calc(${event.duration / 60} * 100% / 12 )`,
-        width: `${100 / event.overlappingEvents(events).length}%`,
+        width: `${width}%`,
         top: `calc((${event.timeSlot.startTime.hour()} - 10)* 100% / 12 + 100% / 12 + ${
           event.timeSlot.startTime.minute() / 60
         } * 100% / 12 )`,
-        left: `${
-          (100 / overlappingEvents.length) * overlappingEvents.indexOf(event)
-        }%`,
+        left: `0%`,
       }}
     >
       {event.id}

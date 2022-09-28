@@ -26,5 +26,6 @@ export class Event {
         event.timeSlot.isOverlapping(this.timeSlot) ? [...res, event] : res,
       [] as Array<Event>
     );
+    // .filter((event) => event !== this);
   }
 }
