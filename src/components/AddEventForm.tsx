@@ -31,9 +31,7 @@ export const AddEventForm = ({
               start: startTime.current?.value ?? '00:00',
               duration: parseInt(duration.current?.value ?? '0', 10),
             }),
-          ].sort((a, b) =>
-            a.timeSlot.startTime.isAfter(b.timeSlot.startTime) ? 1 : -1
-          );
+          ].sort((a, b) => (a.timeSlot.startTime.isAfter(b.timeSlot.startTime) ? 1 : -1));
         });
       }}
     >

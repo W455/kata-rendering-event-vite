@@ -1,14 +1,8 @@
 import styled from '@emotion/styled';
-import { LocalTime } from '@js-joda/core';
 import { useMemo, useState } from 'react';
 import { Event, RawEvent } from '../types/event';
 import rawEvents from '../input.json';
-import {
-  ActualTimeOfTheDayIndicator,
-  AddEventForm,
-  DrawEvent,
-  TimeStamps,
-} from './';
+import { ActualTimeOfTheDayIndicator, DrawEvent, TimeStamps } from './';
 
 const Container = styled.div`
   min-width: 100vw;
@@ -17,7 +11,7 @@ const Container = styled.div`
   box-sizing: border-box !important;
   display: flex;
   flex-direction: row;
-  position: relative
+  position: relative;
 `;
 
 const HourSlice = styled('div')<{ index: number }>`
@@ -51,55 +45,67 @@ const computeEventsWidthsAndPosition = (events: Readonly<Array<Event>>) => {
       ),
     new Map<Event, Array<Event>>()
   );
+  const overlappingEventMapUnfiltred = events.reduce(
+    (map, event) => map.set(event, event.overlappingEvents(events)),
+    new Map<Event, Array<Event>>()
+  );
   const map1 = Array.from(overlappingEventMap.values());
   let computation0: Map<Event, number> = new Map();
-  overlappingEventMap.forEach((array, event) =>
-    computation0.set(event, 100 / (array.length + 1))
-  );
-  let computation1: Map<Event, number> = new Map();
+  overlappingEventMap.forEach((array, event) => computation0.set(event, 100 / (array.length + 1)));
+  let computation1: Map<Event, Set<Event>> = new Map();
   overlappingEventMap.forEach((array, event, map) =>
-    computation1.set(
-      event,
-      100 /
-        (new Set(map1.filter((tab) => tab.includes(event)).flat(1)).size + 1)
-    )
+    computation1.set(event, new Set(map1.filter((tab) => tab.includes(event)).flat(1)))
   );
   let computation2 = events.reduce(
     (map, event) =>
-      map.set(
-        event,
-        Math.max(computation0.get(event) || 0, computation1.get(event) || 0)
-      ),
+      map.set(event, Math.max(computation0.get(event) || 0, 100 / ((computation1.get(event)?.size || 0) + 1))),
     new Map<Event, number>()
   );
 
-  console.log({
-    overlappingEventMap,
-    map1,
-    computation0,
-    computation1,
-    computation2,
-  });
-  return computation2;
+  const result = events.reduce((res, event, index) => {
+    const width = computation2.get(event) || 0;
+    const calcul = overlappingEventMapUnfiltred
+      .get(event)
+      ?.slice(0, overlappingEventMapUnfiltred.get(event)?.indexOf(event))
+      .reduce((res, e) => computation2.get(e) || 0, 0);
+
+    const position = overlappingEventMapUnfiltred.get(event)?.indexOf(event) || 0;
+
+    return [...res, { event, width, position }];
+  }, [] as { event: Event; width: number; position: number }[]);
+
+  return result;
 };
 
-const generateCalendarEvents = (events: Readonly<Array<Event>>) => {
-  const computation = computeEventsWidthsAndPosition(events);
-  return events.map((event) => {
-    const width = computation.get(event);
-    return { event, width };
-  });
-};
+// const generateCalendarEvents = (events: Readonly<Array<Event>>) => {
+//   const computation = computeEventsWidthsAndPosition(events);
+//   const overlappingEventMap = events.reduce(
+//     (map, event) =>
+//       map.set(
+//         event,
+//         event.overlappingEvents(events)
+//       ),
+//     new Map<Event, Array<Event>>()
+//   );
+//
+//   const result = events.map((event, index) => {
+//     const width = computation.get(event) || 0;
+//     const calcul = overlappingEventMap.get(event)?.reduce((res, event) => 0)
+//     const position = overlappingEventMap.get(event)?.indexOf(event) || 0
+//
+//     return { event, width, position };
+//   });
+//
+//   return result
+// };
 
 export const Calendar = () => {
   const [events, setEvents] = useState(() => parseEvents(rawEvents));
-  const maxId = useMemo(
-    () => events.reduce((res, ev) => Math.max(ev.id, res), 0),
-    [events]
-  );
+  const maxId = useMemo(() => events.reduce((res, ev) => Math.max(ev.id, res), 0), [events]);
 
-  const calendarEvents = generateCalendarEvents(events);
-  computeEventsWidthsAndPosition(events);
+  const calendarEvents = computeEventsWidthsAndPosition(events);
+  // computeEventsWidthsAndPosition(events);
+  console.log({ calendarEvents });
   return (
     <div
       style={{
@@ -127,8 +133,8 @@ export const Calendar = () => {
           {[...Array(12)].map((x, i) => (
             <HourSlice key={i} index={i} />
           ))}
-          {calendarEvents?.map(({ event, width }, i) => (
-            <DrawEvent event={event} width={width} key={event.id} />
+          {calendarEvents?.map(({ event, width, position }, i) => (
+            <DrawEvent event={event} width={width} position={position} key={event.id} />
           ))}
         </Container>
       </div>

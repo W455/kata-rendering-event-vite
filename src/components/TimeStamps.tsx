@@ -9,7 +9,6 @@ const TimeStampContainer = styled('div')`
 const TimeStampItem = styled('div')`
   position: relative;
   height: calc(100% / 12);
-  
 `;
 
 export const TimeStamps = () => {
@@ -17,11 +16,7 @@ export const TimeStamps = () => {
     <TimeStampContainer id="timestamps">
       {[...Array(12)].map((x, i) => (
         <TimeStampItem key={`timestamp-${i}`}>
-          {i !== 0 && (
-            <p style={{ transform: 'translate(0%, -50%)', margin: 0 }}>
-              {i + 9}h00
-            </p>
-          )}
+          {i !== 0 && <p style={{ transform: 'translate(0%, -50%)', margin: 0 }}>{i + 9}h00</p>}
         </TimeStampItem>
       ))}
     </TimeStampContainer>

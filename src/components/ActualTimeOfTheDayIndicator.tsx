@@ -12,9 +12,7 @@ export const ActualTimeOfTheDayIndicator = () => {
         borderBottom: '2px solid red',
         zIndex: 10,
         width: '100%',
-        top: `calc((${hour} - 10)* 100% / 12 + 100% / 12 + ${
-          minutes / 60
-        } * 100% / 12 )`,
+        top: `calc((${hour} - 10)* 100% / 12 + 100% / 12 + ${minutes / 60} * 100% / 12 )`,
       }}
     ></div>
   );

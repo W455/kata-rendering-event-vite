@@ -13,13 +13,7 @@ const colors = [
   '#6A2424',
 ];
 
-export const DrawEvent = ({
-  event,
-  width,
-}: {
-  event: Event;
-  width: number;
-}) => {
+export const DrawEvent = ({ event, width, position }: { event: Event; width: number; position: number }) => {
   return (
     <div
       style={{
@@ -34,7 +28,7 @@ export const DrawEvent = ({
         top: `calc((${event.timeSlot.startTime.hour()} - 10)* 100% / 12 + 100% / 12 + ${
           event.timeSlot.startTime.minute() / 60
         } * 100% / 12 )`,
-        left: `0%`,
+        left: `${position * width}%`,
       }}
     >
       {event.id}
