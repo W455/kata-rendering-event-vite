@@ -1,5 +1,5 @@
-import { LocalTime, ChronoUnit, ChronoField } from '@js-joda/core';
-import { RawEvent } from './event';
+import { ChronoField, ChronoUnit, Duration, LocalTime } from '@js-joda/core';
+import { RawEvent } from '../types';
 
 export class TimeSlot {
   startTime: LocalTime;
@@ -13,7 +13,11 @@ export class TimeSlot {
         : LocalTime.MAX;
   }
 
-  isOverlapping(timeSlotToTest: TimeSlot) {
+  duration() {
+    return Duration.between(this.startTime, this.endTime);
+  }
+
+  overlaps(timeSlotToTest: TimeSlot) {
     return (
       Math.min(
         this.endTime.get(ChronoField.MINUTE_OF_DAY) - 1,

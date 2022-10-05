@@ -1,4 +1,4 @@
-import { Event } from '../types/event';
+import { Event } from '../lib/models/event';
 
 const colors = [
   '#a6b1e1',

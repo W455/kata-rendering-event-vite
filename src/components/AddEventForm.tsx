@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
 import { useRef } from 'react';
-import { Event } from '../types/event';
+import { Event } from '../lib/models/event';
 
 const InputsContainer = styled('form')`
   display: flex;
