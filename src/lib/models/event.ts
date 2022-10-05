@@ -1,3 +1,4 @@
+import Color from 'color';
 import { RawEvent } from '../types';
 import { TimeSlot } from './time-slot';
 
@@ -25,13 +26,13 @@ export class Event implements IEvent {
   id: number;
   duration: number;
   timeSlot: TimeSlot;
-  color?: string;
+  rgbColor: Color;
 
   constructor({ id, start, duration, color }: RawEvent & { color?: string }) {
     this.id = id;
     this.timeSlot = new TimeSlot({ start, duration });
     this.duration = duration;
-    this.color = color ?? colors[id % colors.length];
+    this.rgbColor = Color(color ?? colors[id % colors.length]);
   }
 
   getConcurrentEvents(events: Readonly<Array<Event>>) {
