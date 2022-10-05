@@ -1,12 +1,12 @@
 import styled from '@emotion/styled';
 import { useMemo, useState } from 'react';
-import { Event, RawEvent } from '../types/event';
 import rawEvents from '../input.json';
-import { ActualTimeOfTheDayIndicator, DrawEvent, TimeStamps } from './';
+import { Event, RawEvent } from '../types/event';
+import { ActualTimeOfTheDayIndicator, AddEventForm, DrawEvent, TimeStamps } from './';
 
 const Container = styled.div`
-  min-width: 100vw;
   height: 100%;
+  flex: 1 2;
   background-color: lightgray;
   box-sizing: border-box !important;
   display: flex;
@@ -36,79 +36,47 @@ function parseEvents(data: Array<RawEvent>) {
     });
 }
 
-const computeEventsWidthsAndPosition = (events: Readonly<Array<Event>>) => {
-  const overlappingEventMap = events.reduce(
-    (map, event) =>
-      map.set(
-        event,
-        event.overlappingEvents(events).filter((e) => event !== e)
-      ),
-    new Map<Event, Array<Event>>()
-  );
-  const overlappingEventMapUnfiltred = events.reduce(
-    (map, event) => map.set(event, event.overlappingEvents(events)),
-    new Map<Event, Array<Event>>()
-  );
-  const map1 = Array.from(overlappingEventMap.values());
-  let computation0: Map<Event, number> = new Map();
-  overlappingEventMap.forEach((array, event) => computation0.set(event, 100 / (array.length + 1)));
-  let computation1: Map<Event, Set<Event>> = new Map();
-  overlappingEventMap.forEach((array, event, map) =>
-    computation1.set(event, new Set(map1.filter((tab) => tab.includes(event)).flat(1)))
-  );
-  let computation2 = events.reduce(
-    (map, event) =>
-      map.set(event, Math.max(computation0.get(event) || 0, 100 / ((computation1.get(event)?.size || 0) + 1))),
-    new Map<Event, number>()
-  );
+const generateCalendarEvents = (events: Readonly<Array<Event>>) => {
+  return events.reduce((map, event) => {
+    const concurrentsConsecutiveEvents = event.getOverlappedConsecutiveEvents(events);
+    let width = 0;
+    let position = 0;
+    if (concurrentsConsecutiveEvents.findIndex((e) => e === event) === 0) {
+      position = 0;
+      width = 100 / concurrentsConsecutiveEvents.length;
+    } else {
+      const prev = map.get(
+        concurrentsConsecutiveEvents.at(concurrentsConsecutiveEvents.findIndex((e) => e === event) - 1)!
+      )!;
 
-  const result = events.reduce((res, event, index) => {
-    const width = computation2.get(event) || 0;
-    const calcul = overlappingEventMapUnfiltred
-      .get(event)
-      ?.slice(0, overlappingEventMapUnfiltred.get(event)?.indexOf(event))
-      .reduce((res, e) => computation2.get(e) || 0, 0);
-
-    const position = overlappingEventMapUnfiltred.get(event)?.indexOf(event) || 0;
-
-    return [...res, { event, width, position }];
-  }, [] as { event: Event; width: number; position: number }[]);
-
-  return result;
+      const remaining = concurrentsConsecutiveEvents.slice(
+        concurrentsConsecutiveEvents.findIndex((e) => e === event)
+      ).length;
+      const freeSpace = 100 - (prev.position + prev.width);
+      width = freeSpace > 0 ? freeSpace / remaining : 100 - prev.width * (concurrentsConsecutiveEvents.length - 1);
+      position = freeSpace - width < 0 ? 0 : prev.position + prev.width;
+      if (event.id === 18)
+        console.log('prev', {
+          prev,
+          concurrentsConsecutiveEvents,
+          freeSpace,
+          remaining,
+        });
+    }
+    return map.set(event, { event, position, width });
+  }, new Map<Event, { event: Event; position: number; width: number }>());
 };
-
-// const generateCalendarEvents = (events: Readonly<Array<Event>>) => {
-//   const computation = computeEventsWidthsAndPosition(events);
-//   const overlappingEventMap = events.reduce(
-//     (map, event) =>
-//       map.set(
-//         event,
-//         event.overlappingEvents(events)
-//       ),
-//     new Map<Event, Array<Event>>()
-//   );
-//
-//   const result = events.map((event, index) => {
-//     const width = computation.get(event) || 0;
-//     const calcul = overlappingEventMap.get(event)?.reduce((res, event) => 0)
-//     const position = overlappingEventMap.get(event)?.indexOf(event) || 0
-//
-//     return { event, width, position };
-//   });
-//
-//   return result
-// };
 
 export const Calendar = () => {
   const [events, setEvents] = useState(() => parseEvents(rawEvents));
   const maxId = useMemo(() => events.reduce((res, ev) => Math.max(ev.id, res), 0), [events]);
 
-  const calendarEvents = computeEventsWidthsAndPosition(events);
-  // computeEventsWidthsAndPosition(events);
-  console.log({ calendarEvents });
+  const calendarEvents = Array.from(generateCalendarEvents(events).values());
+  console.log(calendarEvents);
   return (
     <div
       style={{
+        width: '100vw',
         display: 'flex',
         minHeight: '100vh',
         height: '100vh',
@@ -134,11 +102,17 @@ export const Calendar = () => {
             <HourSlice key={i} index={i} />
           ))}
           {calendarEvents?.map(({ event, width, position }, i) => (
-            <DrawEvent event={event} width={width} position={position} key={event.id} />
+            <DrawEvent
+              event={event}
+              width={width}
+              position={position}
+              key={event.id}
+              onRemoveEvent={(eventToRemove) => setEvents(events.filter((e) => e !== eventToRemove))}
+            />
           ))}
         </Container>
       </div>
-      {/* <AddEventForm setEvents={setEvents} maxId={maxId} /> */}
+      <AddEventForm setEvents={setEvents} maxId={maxId} />
     </div>
   );
 };

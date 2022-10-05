@@ -1,4 +1,4 @@
-import { Event, RawEvent } from '../types/event';
+import { Event } from '../types/event';
 
 const colors = [
   '#a6b1e1',
@@ -13,7 +13,17 @@ const colors = [
   '#6A2424',
 ];
 
-export const DrawEvent = ({ event, width, position }: { event: Event; width: number; position: number }) => {
+export const DrawEvent = ({
+  event,
+  width,
+  position,
+  onRemoveEvent,
+}: {
+  event: Event;
+  width: number;
+  position: number;
+  onRemoveEvent: (event: Event) => void;
+}) => {
   return (
     <div
       style={{
@@ -28,10 +38,11 @@ export const DrawEvent = ({ event, width, position }: { event: Event; width: num
         top: `calc((${event.timeSlot.startTime.hour()} - 10)* 100% / 12 + 100% / 12 + ${
           event.timeSlot.startTime.minute() / 60
         } * 100% / 12 )`,
-        left: `${position * width}%`,
+        left: `${position}%`,
       }}
     >
       {event.id}
+      {/*<div onClick={() => onRemoveEvent(event)}>X</div>*/}
     </div>
   );
 };

@@ -1,5 +1,4 @@
 import { TimeSlot } from './timeSlot';
-import { LocalTime } from '@js-joda/core';
 
 export type RawEvent = {
   id: number;
@@ -20,11 +19,22 @@ export class Event {
     this.color = color ?? 'red';
   }
 
-  overlappingEvents(events: Readonly<Array<Event>>) {
+  getOverlappedEvents(events: Readonly<Array<Event>>) {
     return events.reduce(
       (res, event) => (event.timeSlot.isOverlapping(this.timeSlot) ? [...res, event] : res),
       [] as Array<Event>
     );
-    // .filter((event) => event !== this);
+  }
+
+  isOverlapping(event: Event) {
+    return this.timeSlot.isOverlapping(event.timeSlot);
+  }
+
+  getOverlappedConsecutiveEvents(events: Readonly<Array<Event>>) {
+    return events.reduce((res, event) => {
+      return event.isOverlapping(this) && !res.some((e) => !e.isOverlapping(event) && res.length > 0)
+        ? [...res, event]
+        : res;
+    }, [] as Array<Event>);
   }
 }

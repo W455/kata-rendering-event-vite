@@ -1,9 +1,17 @@
 import { LocalTime } from '@js-joda/core';
+import { useEffect, useState } from 'react';
 
 export const ActualTimeOfTheDayIndicator = () => {
-  const hour = LocalTime.of(16, 24).hour();
-  const minutes = LocalTime.of(16, 45).minute();
-  console.log(hour);
+  const [currentTime, setCurrentTime] = useState(LocalTime.now());
+  const hour = currentTime.hour();
+  const minutes = currentTime.minute();
+
+  useEffect(() => {
+    const intervalId = setInterval(() => setCurrentTime(LocalTime.now()), 1000 * 60);
+    console.log(currentTime.toString());
+    return () => clearInterval(intervalId);
+  }, []);
+
   return (
     <div
       style={{
