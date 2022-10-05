@@ -2,11 +2,15 @@ import * as React from 'react';
 import { createContext, ReactNode, useContext, useReducer } from 'react';
 
 type Dispatch = (action: ConfigurationContextAction) => void;
-type ConfigurationContextAction = { type: 'TOGGLE_DISPLAY_CURRENT_TIME' } | { type: 'TOGGLE_DISPLAY_ADD_EVENT_FORM' };
+type ConfigurationContextAction =
+  | { type: 'TOGGLE_DISPLAY_CURRENT_TIME' }
+  | { type: 'TOGGLE_DISPLAY_ADD_EVENT_FORM' }
+  | { type: 'TOGGLE_DISPLAY_TIME_STAMPS' };
 
 type ConfigurationContextState = {
   displayCurrentTime: boolean;
   displayAddEventForm: boolean;
+  displayTimeStamps: boolean;
 };
 
 const ConfigurationContext = createContext<{ state: ConfigurationContextState; dispatch: Dispatch } | null>(null);
@@ -21,6 +25,9 @@ function configurationReducer(state: ConfigurationContextState, action: Configur
     case 'TOGGLE_DISPLAY_ADD_EVENT_FORM': {
       return { ...state, displayAddEventForm: !state.displayAddEventForm };
     }
+    case 'TOGGLE_DISPLAY_TIME_STAMPS': {
+      return { ...state, displayTimeStamps: !state.displayTimeStamps };
+    }
     default: {
       throw new Error(`Unhandled action type`);
     }
@@ -28,7 +35,11 @@ function configurationReducer(state: ConfigurationContextState, action: Configur
 }
 
 function ConfigurationContextProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(configurationReducer, { displayCurrentTime: false, displayAddEventForm: false });
+  const [state, dispatch] = useReducer(configurationReducer, {
+    displayTimeStamps: false,
+    displayCurrentTime: false,
+    displayAddEventForm: false,
+  });
   const value = { state, dispatch };
   return <ConfigurationContext.Provider value={value!}>{children}</ConfigurationContext.Provider>;
 }

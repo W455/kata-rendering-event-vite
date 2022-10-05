@@ -1,7 +1,7 @@
 import styled from '@emotion/styled';
 import { useState } from 'react';
 import rawEvents from '../input.json';
-import { generateEvents, useConfigurationContext, useGenerateCalendarEvents } from '../lib';
+import { generateEvents, useConfigurationContext } from '../lib';
 import { AddEventForm, DailyCalendar } from './';
 
 const MainContainer = styled('div')`
@@ -15,9 +15,8 @@ const MainContainer = styled('div')`
 
 export const Overview = () => {
   const [events, setEvents] = useState(() => generateEvents(rawEvents));
-  const calendarEvents = useGenerateCalendarEvents(events);
   const {
-    state: { displayCurrentTime, displayAddEventForm },
+    state: { displayCurrentTime, displayAddEventForm, displayTimeStamps },
     dispatch,
   } = useConfigurationContext();
 
@@ -44,8 +43,16 @@ export const Overview = () => {
             onChange={() => dispatch({ type: 'TOGGLE_DISPLAY_CURRENT_TIME' })}
           />
         </label>
+        <label>
+          Display timeStamps
+          <input
+            type={'checkbox'}
+            checked={displayTimeStamps}
+            onChange={() => dispatch({ type: 'TOGGLE_DISPLAY_TIME_STAMPS' })}
+          />
+        </label>
       </form>
-      <DailyCalendar />
+      <DailyCalendar setEvents={setEvents} events={events} />
       {displayAddEventForm && <AddEventForm setEvents={setEvents} events={events} />}
     </MainContainer>
   );

@@ -4,12 +4,20 @@ import { useConfigurationContext } from '../lib';
 const TimeStampContainer = styled('div')`
   height: 100%;
   min-width: 2.5rem;
+  color: gray;
   background-color: white;
 `;
 
-const TimeStampItem = styled('div')`
+const TimeStampItem = styled('div')<{ isLastItem: boolean }>`
   position: relative;
-  height: calc(100% / 12);
+  height: ${({ isLastItem }) => `${isLastItem ? 'calc(100% / 12)' : '0'}`};
+`;
+
+const TimeStampLabel = styled('p')<{ index: number; range: number }>`
+  text-align: right;
+  transform: ${({ index, range }) => `translate(-10%, ${index === 0 ? '10' : index === range ? '-110' : '-50'}%)`};
+  margin: 0;
+  overflow: hidden;
 `;
 
 export const TimeStamps = () => {
@@ -17,16 +25,16 @@ export const TimeStamps = () => {
     state: { displayCurrentTime },
   } = useConfigurationContext();
 
-  const span = 13;
+  const range = 12;
 
   return (
     <TimeStampContainer id="timestamps">
-      {[...Array(span + 1)].map((x, i) => (
-        <TimeStampItem key={`timestamp-${i}`}>
+      {[...Array(range + 1)].map((x, i) => (
+        <TimeStampItem key={`timestamp-${i}`} isLastItem={i !== range}>
           {
-            <p style={{ transform: `translate(0%, ${i === 0 ? '10' : i === span - 1 ? '-110' : '-50'}%)`, margin: 0 }}>
-              {`${(i + 9).toString().padStart(2, '0')}h00`.padStart(5, '0')}
-            </p>
+            <TimeStampLabel index={i} range={range}>
+              {`${(i + 9).toString().padStart(2, '0')}h`.padStart(3, '0')}
+            </TimeStampLabel>
           }
         </TimeStampItem>
       ))}

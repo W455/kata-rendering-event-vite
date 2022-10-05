@@ -18,10 +18,20 @@ const CurrentTimeIndicatorText = styled(CurrentTimeIndicatorBase)<{ hours: numbe
   width: fit-content;
   background-color: white;
   transform: translate(-100%, -40%);
+
+  &::before {
+    content: '';
+    margin: 0 -5px;
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 7.5px;
+    background-color: red;
+  }
 `;
 
 export const CurrentTimeOfTheDayIndicator = () => {
-  const [currentTime, setCurrentTime] = useState(LocalTime.of(9, 0));
+  const [currentTime, setCurrentTime] = useState(LocalTime.now);
   const [hours, minutes] = [currentTime.hour(), currentTime.minute()];
 
   useEffect(() => {
@@ -33,9 +43,7 @@ export const CurrentTimeOfTheDayIndicator = () => {
   return (
     <>
       <CurrentTimeIndicatorBar hours={hours} minutes={minutes} />
-      <CurrentTimeIndicatorText hours={hours} minutes={minutes}>
-        {`${hours.toString().padStart(2, '0')}h${minutes.toString().padEnd(2, '0')}`}
-      </CurrentTimeIndicatorText>
+      <CurrentTimeIndicatorText hours={hours} minutes={minutes} />
     </>
   );
 };

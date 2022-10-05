@@ -1,7 +1,6 @@
 import styled from '@emotion/styled';
-import { useState } from 'react';
-import rawEvents from '../input.json';
-import { generateEvents, useConfigurationContext, useGenerateCalendarEvents } from '../lib';
+import React from 'react';
+import { Event, useConfigurationContext, useGenerateCalendarEvents } from '../lib';
 import { CurrentTimeOfTheDayIndicator } from './CurrentTimeOfTheDayIndicator';
 import { DrawEvent } from './DrawEvent';
 import { TimeStamps } from './TimeStamps';
@@ -9,11 +8,11 @@ import { TimeStamps } from './TimeStamps';
 const Container = styled.div`
   height: 100%;
   flex: 1 2;
-  background-color: lightgray;
   box-sizing: border-box !important;
   display: flex;
   flex-direction: row;
   position: relative;
+  border-left: 1px solid grey;
 `;
 
 const HourSlice = styled('div')<{ index: number }>`
@@ -35,27 +34,30 @@ const Main = styled('div')`
   position: relative;
 `;
 
-export const DailyCalendar = () => {
-  const [events, setEvents] = useState(() => generateEvents(rawEvents));
+export const DailyCalendar = ({
+  events,
+  setEvents,
+}: {
+  events: Readonly<Array<Event>>;
+  setEvents: React.Dispatch<React.SetStateAction<Event[]>>;
+}) => {
   const calendarEvents = useGenerateCalendarEvents(events);
   const {
-    state: { displayCurrentTime },
+    state: { displayCurrentTime, displayTimeStamps },
   } = useConfigurationContext();
 
   return (
     <Main>
-      <TimeStamps />
+      {displayTimeStamps && <TimeStamps />}
       <Container>
         {displayCurrentTime && <CurrentTimeOfTheDayIndicator />}
         {[...Array(12)].map((x, i) => (
           <HourSlice key={i} index={i} />
         ))}
-        {calendarEvents?.map(({ event, width, position }, i) => (
+        {calendarEvents?.map((calendarEvent, i) => (
           <DrawEvent
-            event={event}
-            width={width}
-            position={position}
-            key={event.id}
+            calendarEvent={calendarEvent}
+            key={calendarEvent.event.id}
             onRemoveEvent={(eventToRemove) => setEvents(events.filter((e) => e !== eventToRemove))}
           />
         ))}

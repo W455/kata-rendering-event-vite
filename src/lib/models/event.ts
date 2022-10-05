@@ -12,7 +12,7 @@ const colors = [
   '#b86800',
   '#673C59',
   '#386600',
-  '#6A2424',
+  '#a12f2f',
 ];
 
 export interface IEvent {
@@ -32,7 +32,7 @@ export class Event implements IEvent {
     this.id = id;
     this.timeSlot = new TimeSlot({ start, duration });
     this.duration = duration;
-    this.rgbColor = Color(color ?? colors[id % colors.length]);
+    this.rgbColor = Color(color ?? colors[id % colors.length]).rotate((id / colors.length) * 20);
   }
 
   getConcurrentEvents(events: Readonly<Array<Event>>) {
