@@ -1,6 +1,19 @@
 import { RawEvent } from '../types';
 import { TimeSlot } from './time-slot';
 
+const colors = [
+  '#a6b1e1',
+  '#ffb85c',
+  '#bf93b1',
+  '#8cb25d',
+  '#d07676',
+  '#576bc7',
+  '#b86800',
+  '#673C59',
+  '#386600',
+  '#6A2424',
+];
+
 export interface IEvent {
   id: number;
   duration: number;
@@ -18,7 +31,7 @@ export class Event implements IEvent {
     this.id = id;
     this.timeSlot = new TimeSlot({ start, duration });
     this.duration = duration;
-    this.color = color ?? 'red';
+    this.color = color ?? colors[id % colors.length];
   }
 
   getConcurrentEvents(events: Readonly<Array<Event>>) {

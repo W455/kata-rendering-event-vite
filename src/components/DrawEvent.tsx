@@ -1,18 +1,5 @@
 import { Event } from '../lib/models/event';
 
-const colors = [
-  '#a6b1e1',
-  '#ffb85c',
-  '#bf93b1',
-  '#8cb25d',
-  '#d07676',
-  '#576bc7',
-  '#b86800',
-  '#673C59',
-  '#386600',
-  '#6A2424',
-];
-
 export const DrawEvent = ({
   event,
   width,
@@ -31,7 +18,7 @@ export const DrawEvent = ({
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 10,
-        backgroundColor: colors[event.id % colors.length],
+        backgroundColor: event.color,
         position: 'absolute',
         height: `calc(${event.duration / 60} * 100% / 12 )`,
         width: `${width}%`,

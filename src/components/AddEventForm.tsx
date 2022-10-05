@@ -1,6 +1,6 @@
 import styled from '@emotion/styled';
-import { useRef } from 'react';
-import { Event } from '../lib/models/event';
+import React, { useMemo, useRef } from 'react';
+import { Event } from '../lib';
 
 const InputsContainer = styled('form')`
   display: flex;
@@ -9,12 +9,13 @@ const InputsContainer = styled('form')`
 `;
 
 export const AddEventForm = ({
-  maxId,
+  events,
   setEvents,
 }: {
-  maxId: number;
+  events: Readonly<Array<Event>>;
   setEvents: React.Dispatch<React.SetStateAction<Event[]>>;
 }) => {
+  const maxId = useMemo(() => events.reduce((res, ev) => Math.max(ev.id, res), 0), [events]);
   const startTime = useRef<HTMLInputElement>(null);
   const duration = useRef<HTMLInputElement>(null);
   const name = useRef<HTMLInputElement>(null);
