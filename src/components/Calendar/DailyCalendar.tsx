@@ -1,9 +1,8 @@
 import styled from '@emotion/styled';
 import React from 'react';
-import { Event, useConfigurationContext, useGenerateCalendarEvents } from '../lib';
-import { CurrentTimeOfTheDayIndicator } from './CurrentTimeOfTheDayIndicator';
+import { Event, useConfigurationContext, useGenerateCalendarEvents } from '../../lib';
+import { CurrentTimeOfTheDayIndicator, TimeStamps } from '../Configuration';
 import { DrawEvent } from './DrawEvent';
-import { TimeStamps } from './TimeStamps';
 
 const Container = styled.div`
   height: 100%;

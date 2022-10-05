@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { CalendarEvent, Event } from '../lib';
+import { CalendarEvent, Event } from '../../lib';
 
 const StyledEvent = styled('article')<{ calendarEvent: CalendarEvent }>`
   display: flex;

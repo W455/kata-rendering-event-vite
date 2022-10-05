@@ -1,5 +1,5 @@
 import styled from '@emotion/styled';
-import { useConfigurationContext } from '../lib';
+import { useConfigurationContext } from '../../lib';
 
 const TimeStampContainer = styled('div')`
   height: 100%;

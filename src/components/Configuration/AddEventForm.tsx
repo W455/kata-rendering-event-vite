@@ -1,11 +1,11 @@
 import styled from '@emotion/styled';
 import React, { useMemo, useRef } from 'react';
-import { Event } from '../lib';
+import { Event } from '../../lib';
 
-const InputsContainer = styled('form')`
+const InputsContainer = styled('div')`
   display: flex;
   flex-direction: row;
-  gap: 20px;
+  gap: 40px;
 `;
 
 export const AddEventForm = ({
@@ -21,7 +21,7 @@ export const AddEventForm = ({
   const name = useRef<HTMLInputElement>(null);
   const color = useRef<HTMLInputElement>(null);
   return (
-    <InputsContainer
+    <form
       onSubmit={(e) => {
         e.preventDefault();
         setEvents((oldEvents) => {
@@ -36,23 +36,25 @@ export const AddEventForm = ({
         });
       }}
     >
-      <label>
-        Starting time
-        <input ref={startTime} name="startTime" type="time" required />
-      </label>
-      <label>
-        Duration
-        <input ref={duration} type="number" required />
-      </label>
-      <label>
-        Name
-        <input type="text" ref={name} />
-      </label>
-      <label>
-        Color
-        <input type="color" ref={color} />
-      </label>
-      <input type="submit" value="Add" />
-    </InputsContainer>
+      <InputsContainer>
+        <label>
+          Starting time
+          <input ref={startTime} name="startTime" type="time" required />
+        </label>
+        <label>
+          Duration
+          <input ref={duration} type="number" required />
+        </label>
+        <label>
+          Name
+          <input type="text" ref={name} />
+        </label>
+        <label>
+          Color
+          <input type="color" ref={color} />
+        </label>
+        <input type="submit" value="Add" />
+      </InputsContainer>
+    </form>
   );
 };
